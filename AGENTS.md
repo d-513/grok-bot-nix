@@ -19,7 +19,8 @@ The browser redirect `api2.cursor.sh/updates/download/stable/linux-x64/grok-bot-
 always points at latest — never use it as `src`.
 
 `version`, `commitSha`, and `hashes` in `package.nix` are rewritten by
-`./update.sh`. Keep those assignment lines in the form the script greps.
+`./update.sh`. Keep the `hashes = { ... };` block distinct from `archTag` /
+`debArch` — the updater greps those system keys only inside `hashes`.
 
 A stale pin does **not** fail the build. The URL is versioned by `commitSha`, so
 Nix keeps fetching that exact `.deb`. You only get a hash mismatch if the file

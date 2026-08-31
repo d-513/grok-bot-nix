@@ -72,8 +72,9 @@ read_attr() {
   sed -n "s/^  $1 = \"\\(.*\\)\";$/\\1/p" package.nix | head -n1
 }
 
+# Only the `hashes = { ... };` attrset — archTag/debArch use the same keys.
 read_hash() {
-  sed -n "s/^    $1 = \"\\(.*\\)\";$/\\1/p" package.nix
+  sed -n "/^  hashes = {/,/^  };/ s/^    $1 = \"\\(.*\\)\";$/\\1/p" package.nix
 }
 
 current_version="$(read_attr version)"
@@ -131,8 +132,8 @@ echo "$current_version ($current_commit) -> $version ($commitSha)" >&2
 sed -i \
   -e "s|^  version = \".*\";$|  version = \"${version}\";|" \
   -e "s|^  commitSha = \".*\";$|  commitSha = \"${commitSha}\";|" \
-  -e "s|^    x86_64-linux = \".*\";$|    x86_64-linux = \"${hash_x64}\";|" \
-  -e "s|^    aarch64-linux = \".*\";$|    aarch64-linux = \"${hash_arm}\";|" \
+  -e "/^  hashes = {/,/^  };/ s|^    x86_64-linux = \".*\";$|    x86_64-linux = \"${hash_x64}\";|" \
+  -e "/^  hashes = {/,/^  };/ s|^    aarch64-linux = \".*\";$|    aarch64-linux = \"${hash_arm}\";|" \
   package.nix
 
 if [ "$(read_attr version)" != "$version" ] \
