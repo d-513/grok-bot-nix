@@ -28,20 +28,22 @@ runs `./update.sh` every six hours and pushes a new pin when the feed moves.
 
 ## Layout
 
-Install prefix: `$out/share/grok-bot` (no spaces; upstream uses `/opt/Grok Bot`).
-Wrapper: `$out/bin/grok-bot`. Compatibility symlink: `$out/bin/sand`.
+Install prefix: `$out/share/grok-bot` (asar + unpacked natives only).
+Wrapper: nixpkgs `electron_42` → `$out/bin/grok-bot`. Compatibility symlink: `$out/bin/sand`.
+Upstream ships Electron 42.1.0; we run nixpkgs `electron_42` instead of the bundled Chromium.
 
 ## Wrap pitfalls
 
-- `makeShellWrapper`, not `makeWrapper`. `wrapGAppsHook3` otherwise uses
-  `makeBinaryWrapper`, which passes the literal `${NIXOS_OZONE_WL:+…}` string to
-  Electron. `dontWrapGApps = true` then apply `"${gappsWrapperArgs[@]}"` by hand.
-- `--no-sandbox` is required until upstream fixes sandboxed-renderer shm
-  (`FATAL:platform_shared_memory_region_posix.cc`). See the `skip:` comment in
-  `package.nix`.
+- `makeShellWrapper`, not `makeWrapper`, so `${NIXOS_OZONE_WL:+…}` expands in a
+  shell. nixpkgs `electron_42` already carries GApps; do not wrapGApps again.
 - `CHROME_DESKTOP=grok-bot.desktop` so Electron registers `sand://` / `grokbot://`
   against the right desktop id.
+- `--class=grok-bot --name=grok-bot` so KDE/Wayland `app_id` matches
+  `grok-bot.desktop`. Without that, wrapping nixpkgs `electron` shows the
+  generic Wayland icon. Plasma still only sees the icon if the package is on
+  the session `XDG_DATA_DIRS` (NixOS / Home Manager / `nix profile`), not
+  `nix run` / `./result`.
+- `ELECTRON_FORCE_IS_PACKAGED=1` because we launch via `electron app.asar`.
 - Unfree: `packages` / `apps` import nixpkgs with `allowUnfree` so `nix run`
   works. The overlay does not — consumers must allow `grok-bot`.
-- Do not swap in `pkgs.electron`; bundled `.node` modules are ABI-tied to
-  upstream's Electron.
+- Native `.node` modules are ABI-tied to Electron 42. Stay on `electron_42`.
