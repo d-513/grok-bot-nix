@@ -37,6 +37,10 @@ Upstream ships Electron 42.1.0; we run nixpkgs `electron_42` instead of the bund
 
 - `makeShellWrapper`, not `makeWrapper`, so `${NIXOS_OZONE_WL:+…}` expands in a
   shell. nixpkgs `electron_42` already carries GApps; do not wrapGApps again.
+- Rewrite `Exec=` in `grok-bot.desktop` unconditionally. Upstream has shipped both
+  `Exec="/opt/Grok Bot/grok-bot" %U` (0.30) and `Exec=grok-bot %U` (0.39). A
+  `--replace-fail` on one spelling breaks the next pin; `sed` the whole line to
+  `$out/bin/grok-bot %U`.
 - `CHROME_DESKTOP=grok-bot.desktop` so Electron registers `sand://` / `grokbot://`
   against the right desktop id.
 - `--class=grok-bot --name=grok-bot` so KDE/Wayland `app_id` matches

@@ -69,8 +69,14 @@ stdenv.mkDerivation {
     cp -r usr/share/icons "$out/share/"
     install -Dm644 usr/share/applications/grok-bot.desktop \
       "$out/share/applications/grok-bot.desktop"
-    substituteInPlace "$out/share/applications/grok-bot.desktop" \
-      --replace-fail '"/opt/Grok Bot/grok-bot"' "$out/bin/grok-bot"
+    # Upstream Exec= has been both an absolute /opt path and a PATH lookup.
+    if ! grep -q '^Exec=' "$out/share/applications/grok-bot.desktop"; then
+      echo "error: grok-bot.desktop has no Exec= line" >&2
+      cat "$out/share/applications/grok-bot.desktop" >&2
+      exit 1
+    fi
+    sed -i "s|^Exec=.*|Exec=$out/bin/grok-bot %U|" \
+      "$out/share/applications/grok-bot.desktop"
 
     runHook postInstall
   '';
