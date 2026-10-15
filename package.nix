@@ -14,11 +14,11 @@ let
   inherit (stdenv.hostPlatform) system;
 
   # Rewritten by ./update.sh from the stable JSON feed.
-  version = "0.70.2";
-  commitSha = "52da656f56d317510ca65ad6af3d69a2cde461e0";
+  version = "0.71.2";
+  commitSha = "92808c0ad869b2e3725dbc3b8fa2fcc991687502";
   hashes = {
-    x86_64-linux = "sha256-/3D8IXP5gnvhZIy+rznHwSEqP9myMmxQKL6KL9vvCQA=";
-    aarch64-linux = "sha256-7JLGHdNsTMd9pr/bh8XUzyb0aX+LZ2bjtlmUZ3UAOBg=";
+    x86_64-linux = "sha256-oFJtdaPoUu1Z5QeIm8OqalGFqNBDYyzo3sqYsEqwY0g=";
+    aarch64-linux = "sha256-lW/g28Ksj20P3RUdutIRbp5KUcVqMX6ryfplli7IR48=";
   };
 
   archTag = {
